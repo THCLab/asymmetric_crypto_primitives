@@ -2,9 +2,9 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
-import 'package:nacl_win/nacl_win.dart';
+//import 'package:nacl_win/nacl_win.dart';
 
-import 'package:local_auth/local_auth.dart';
+//import 'package:local_auth/local_auth.dart';
 import 'exceptions.dart';
 
 class Ed25519Signer {
@@ -72,27 +72,27 @@ class Ed25519Signer {
     var isCorrectUuid =
         await _channel.invokeMethod('checkUuid', {'uuid': uuid});
     if (isCorrectUuid) {
-      if (Platform.isWindows) {
-        var pubKey1 =
-            await _channel.invokeMethod('readData', {'key': "${uuid}_1_pub"});
-        var privKey1 =
-            await _channel.invokeMethod('readData', {'key': "${uuid}_1_priv"});
-        await _channel.invokeMethod('deleteData', {'key': "${uuid}_0_pub"});
-        await _channel.invokeMethod('deleteData', {'key': "${uuid}_0_priv"});
-        await _channel.invokeMethod('deleteData', {'key': "${uuid}_1_pub"});
-        await _channel.invokeMethod('deleteData', {'key': "${uuid}_1_priv"});
-        await _channel.invokeMethod(
-            'writeData', {'key': "${uuid}_0_pub", 'data': pubKey1});
-        await _channel.invokeMethod(
-            'writeData', {'key': "${uuid}_0_priv", 'data': privKey1});
-        var edKeyPair = await NaclWin.generateKey();
-        await _channel.invokeMethod(
-            'writeData', {'key': "${uuid}_1_pub", 'data': edKeyPair.pubKey});
-        await _channel.invokeMethod(
-            'writeData', {'key': "${uuid}_1_priv", 'data': edKeyPair.privKey});
-      } else {
-        await _channel.invokeMethod("rotateForEd25519", {'uuid': uuid});
-      }
+      // if (Platform.isWindows) {
+      //   var pubKey1 =
+      //       await _channel.invokeMethod('readData', {'key': "${uuid}_1_pub"});
+      //   var privKey1 =
+      //       await _channel.invokeMethod('readData', {'key': "${uuid}_1_priv"});
+      //   await _channel.invokeMethod('deleteData', {'key': "${uuid}_0_pub"});
+      //   await _channel.invokeMethod('deleteData', {'key': "${uuid}_0_priv"});
+      //   await _channel.invokeMethod('deleteData', {'key': "${uuid}_1_pub"});
+      //   await _channel.invokeMethod('deleteData', {'key': "${uuid}_1_priv"});
+      //   await _channel.invokeMethod(
+      //       'writeData', {'key': "${uuid}_0_pub", 'data': pubKey1});
+      //   await _channel.invokeMethod(
+      //       'writeData', {'key': "${uuid}_0_priv", 'data': privKey1});
+      //   var edKeyPair = await NaclWin.generateKey();
+      //   await _channel.invokeMethod(
+      //       'writeData', {'key': "${uuid}_1_pub", 'data': edKeyPair.pubKey});
+      //   await _channel.invokeMethod(
+      //       'writeData', {'key': "${uuid}_1_priv", 'data': edKeyPair.privKey});
+      //} else {
+      await _channel.invokeMethod("rotateForEd25519", {'uuid': uuid});
+      //}
     } else {
       throw IncorrectUuidException(
           'There are no keys associated with this UUID saved on the device');
@@ -104,32 +104,32 @@ class Ed25519Signer {
     var isCorrectUuid =
         await _channel.invokeMethod('checkUuid', {'uuid': uuid});
     if (isCorrectUuid) {
-      if (Platform.isWindows) {
-        var key =
-            await _channel.invokeMethod('readData', {'key': "${uuid}_0_priv"});
-        final LocalAuthentication auth = LocalAuthentication();
-        try {
-          final bool didAuthenticate = await auth.authenticate(
-              localizedReason: 'Please authenticate to sign the message',
-              options: const AuthenticationOptions(useErrorDialogs: false));
-          if (didAuthenticate) {
-            var signature = await NaclWin.signMessage(message, key);
-            return signature;
-          } else {
-            throw SigningFailureException('Signing the message has failed.');
-          }
-        } on PlatformException {
-          throw SigningFailureException('Signing the message has failed.');
-        }
+      // if (Platform.isWindows) {
+      //   var key =
+      //       await _channel.invokeMethod('readData', {'key': "${uuid}_0_priv"});
+      //   final LocalAuthentication auth = LocalAuthentication();
+      //   try {
+      //     final bool didAuthenticate = await auth.authenticate(
+      //         localizedReason: 'Please authenticate to sign the message',
+      //         options: const AuthenticationOptions(useErrorDialogs: false));
+      //     if (didAuthenticate) {
+      //       var signature = await NaclWin.signMessage(message, key);
+      //       return signature;
+      //     } else {
+      //       throw SigningFailureException('Signing the message has failed.');
+      //     }
+      //   } on PlatformException {
+      //     throw SigningFailureException('Signing the message has failed.');
+      //   }
+      //} else {
+      var signature = await _channel
+          .invokeMethod("signEd25519", {'uuid': uuid, 'message': message});
+      if (signature != false) {
+        return signature;
       } else {
-        var signature = await _channel
-            .invokeMethod("signEd25519", {'uuid': uuid, 'message': message});
-        if (signature != false) {
-          return signature;
-        } else {
-          throw SigningFailureException('Signing the message has failed.');
-        }
+        throw SigningFailureException('Signing the message has failed.');
       }
+      //}
     } else {
       throw IncorrectUuidException(
           'There are no keys associated with this UUID saved on the device');
@@ -140,16 +140,17 @@ class Ed25519Signer {
     var isCorrectUuid =
         await _channel.invokeMethod('checkUuid', {'uuid': uuid});
     if (isCorrectUuid) {
-      if (Platform.isWindows) {
-        var key =
-            await _channel.invokeMethod('readData', {'key': "${uuid}_0_priv"});
-        try {
-          var signature = await NaclWin.signMessage(message, key);
-          return signature;
-        } on PlatformException {
-          throw SigningFailureException('Signing the message has failed.');
-        }
-      } else if (Platform.isIOS || Platform.isMacOS) {
+      // if (Platform.isWindows) {
+      //   var key =
+      //       await _channel.invokeMethod('readData', {'key': "${uuid}_0_priv"});
+      //   try {
+      //     var signature = await NaclWin.signMessage(message, key);
+      //     return signature;
+      //   } on PlatformException {
+      //     throw SigningFailureException('Signing the message has failed.');
+      //   }
+      // } else
+      if (Platform.isIOS || Platform.isMacOS) {
         throw PlatformNotSupportedException(
             'MacOS and iOS are not supported when it comes to authentication-free signing.');
       } else {

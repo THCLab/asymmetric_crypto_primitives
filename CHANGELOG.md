@@ -33,3 +33,9 @@ added dependency on new version of `nacl_win`
 
 ## 0.4.6
 migrated `nacl_win` to new `flutter_rust_bridge` version
+
+## 0.4.8
+added new version of `local_auth` to support keri codegen 
+
+## 0.5.0
+temporarily dropped support for Windows

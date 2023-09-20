@@ -1,10 +1,10 @@
 name: asymmetric_crypto_primitives
 description: Flutter plugin for signing and managing keys on different devices.
-version: 0.4.6
+version: 0.5.0
 homepage: https://github.com/THCLab/asymmetric_crypto_primitives
 
 environment:
-  sdk: ">=2.17.1 <3.0.0"
+  sdk: ">=2.17.1 <4.0.0"
   flutter: ">=2.5.0"
 
 dependencies:
@@ -12,8 +12,7 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
   uuid: ^3.0.6
-  local_auth: ^2.1.2
-  nacl_win: ^0.1.0
+  local_auth: ^2.1.6
 
 dev_dependencies:
   flutter_test:
